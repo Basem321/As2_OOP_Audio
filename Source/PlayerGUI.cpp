@@ -1,17 +1,31 @@
-#include "PlayerGUI.h"
+﻿#include "PlayerGUI.h"
+#include "BinaryData.h"
 
 PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
 {
-    // Add buttons and set this class as their listener
-    for (auto* btn : { &loadButton, &playPauseButton, &goToStartButton, &goToEndButton })
-    {
-        btn->addListener(this);
-        addAndMakeVisible(btn);
-    }
+    // Load images
+    playImage = juce::ImageCache::getFromMemory(BinaryData::start_png, BinaryData::start_pngSize);
+    pauseImage = juce::ImageCache::getFromMemory(BinaryData::Pause_png, BinaryData::Pause_pngSize);
+    toStartImage = juce::ImageCache::getFromMemory(BinaryData::GoToStart_png, BinaryData::GoToStart_pngSize);
+    toEndImage = juce::ImageCache::getFromMemory(BinaryData::GoToEnd_png, BinaryData::GoToEnd_pngSize);
 
-    // Set more descriptive labels
-    goToStartButton.setButtonText("Start");
-    goToEndButton.setButtonText("End");
+    // Setup image buttons
+    playPauseButton.setImages(true, true, true, playImage, 1.0f, {}, playImage, 0.8f, {}, playImage, 0.5f, {});
+    goToStartButton.setImages(true, true, true, toStartImage, 1.0f, {}, toStartImage, 0.8f, {}, toStartImage, 0.5f, {});
+    goToEndButton.setImages(true, true, true, toEndImage, 1.0f, {}, toEndImage, 0.8f, {}, toEndImage, 0.5f, {});
+
+    addAndMakeVisible(loadButton);
+    loadButton.addListener(this);
+
+    addAndMakeVisible(playPauseButton);
+    playPauseButton.addListener(this);
+
+    addAndMakeVisible(goToStartButton);
+    goToStartButton.addListener(this);
+
+    addAndMakeVisible(goToEndButton);
+    goToEndButton.addListener(this);
+    // === MODIFICATION END ===
 
     // Configure and add the volume slider
     volumeSlider.setRange(0.0, 1.0, 0.01);
@@ -22,7 +36,7 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
     // Set initial gain
     playerAudio.setGain((float)volumeSlider.getValue());
 
-    // Start timer to update the play/pause button text
+    // Start timer to update the play/pause button
     startTimerHz(10);
 }
 
@@ -35,7 +49,6 @@ void PlayerGUI::paint(juce::Graphics& g)
 
 void PlayerGUI::resized()
 {
-    // Layout the GUI components
     int buttonWidth = 80;
     int buttonHeight = 40;
     int margin = 10;
@@ -51,8 +64,7 @@ void PlayerGUI::resized()
 
 void PlayerGUI::timerCallback()
 {
-    // Periodically update the button text based on the transport's state
-    updatePlayPauseButtonText();
+    updatePlayPauseButton();
 }
 
 void PlayerGUI::buttonClicked(juce::Button* button)
@@ -92,15 +104,17 @@ void PlayerGUI::buttonClicked(juce::Button* button)
     }
 }
 
-void PlayerGUI::updatePlayPauseButtonText()
+void PlayerGUI::updatePlayPauseButton()
 {
-    if (playerAudio.isPlaying())
+    const auto& currentImage = playPauseButton.getNormalImage();
+
+    if (playerAudio.isPlaying() && currentImage != pauseImage)
     {
-        playPauseButton.setButtonText("Pause");
+        playPauseButton.setImages(true, true, true, pauseImage, 1.0f, {}, pauseImage, 0.8f, {}, pauseImage, 0.5f, {});
     }
-    else
+    else if (!playerAudio.isPlaying() && currentImage != playImage)
     {
-        playPauseButton.setButtonText("Play");
+        playPauseButton.setImages(true, true, true, playImage, 1.0f, {}, playImage, 0.8f, {}, playImage, 0.5f, {});
     }
 }
 

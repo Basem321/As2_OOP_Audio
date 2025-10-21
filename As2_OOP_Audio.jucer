@@ -4,6 +4,10 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
   <MAINGROUP id="slt3AG" name="teeest">
     <GROUP id="{AB22B114-1ABD-A928-B2A4-8751ECA56706}" name="Source">
+      <FILE id="dFGvkl" name="start.png" compile="0" resource="1" file="Source/start.png"/>
+      <FILE id="nBlFuq" name="Pause.png" compile="0" resource="1" file="Source/Pause.png"/>
+      <FILE id="w6bPUJ" name="GoToEnd.png" compile="0" resource="1" file="Source/GoToEnd.png"/>
+      <FILE id="hdYJXy" name="GoToStart.png" compile="0" resource="1" file="Source/GoToStart.png"/>
       <FILE id="fFIBjH" name="PlayerGUI.h" compile="0" resource="0" file="Source/PlayerGUI.h"/>
       <FILE id="shTjUA" name="PlayerGUI.cpp" compile="1" resource="0" file="Source/PlayerGUI.cpp"/>
       <FILE id="Np5GQ2" name="PlayerAudio.h" compile="0" resource="0" file="Source/PlayerAudio.h"/>

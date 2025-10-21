@@ -2,13 +2,14 @@
 #include <JuceHeader.h>
 #include "PlayerAudio.h" // Include the audio engine
 
+// This file was modified to use ImageButtons instead of TextButtons.
+
 class PlayerGUI : public juce::Component,
     public juce::Button::Listener,
     public juce::Slider::Listener,
     public juce::Timer
 {
 public:
-    // The GUI needs a reference to the audio engine to control it
     PlayerGUI(PlayerAudio& audio);
     ~PlayerGUI() override;
 
@@ -23,20 +24,29 @@ private:
     void sliderValueChanged(juce::Slider* slider) override;
 
     //================== Helpers ==================
-    void updatePlayPauseButtonText();
+    // This function now updates the play/pause button's image based on the audio state
+    void updatePlayPauseButton();
 
     // Reference to our audio engine
     PlayerAudio& playerAudio;
 
     // GUI elements
     juce::TextButton loadButton{ "Load File" };
-    juce::TextButton playPauseButton{ "Play" };
-    juce::TextButton stopButton{ "Pause" };
-    juce::TextButton goToStartButton{ "<<" };
-    juce::TextButton goToEndButton{ ">>" };
+
+    // MODIFIED: Switched from TextButton to ImageButton
+    juce::ImageButton playPauseButton;
+    juce::ImageButton goToStartButton;
+    juce::ImageButton goToEndButton;
+
     juce::Slider volumeSlider;
 
     std::unique_ptr<juce::FileChooser> fileChooser;
+
+    // ADDED: Member variables to hold the loaded button images
+    juce::Image playImage;
+    juce::Image pauseImage;
+    juce::Image toStartImage;
+    juce::Image toEndImage;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerGUI)
 };
