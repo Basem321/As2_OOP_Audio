@@ -13,6 +13,9 @@ public:
     PlayerGUI(PlayerAudio& audio);
     ~PlayerGUI() override;
 
+    
+    
+
     //================== Component Overrides ==================
     void paint(juce::Graphics& g) override;
     void resized() override;
@@ -22,6 +25,9 @@ private:
     //================== Listener Overrides ==================
     void buttonClicked(juce::Button* button) override;
     void sliderValueChanged(juce::Slider* slider) override;
+
+    //feature 3 mute button
+    juce::TextButton muteButton{ "mute" };
 
     //================== Helpers ==================
     // This function now updates the play/pause button's image based on the audio state

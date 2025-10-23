@@ -8,6 +8,7 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
     pauseImage = juce::ImageCache::getFromMemory(BinaryData::Pause_png, BinaryData::Pause_pngSize);
     toStartImage = juce::ImageCache::getFromMemory(BinaryData::GoToStart_png, BinaryData::GoToStart_pngSize);
     toEndImage = juce::ImageCache::getFromMemory(BinaryData::GoToEnd_png, BinaryData::GoToEnd_pngSize);
+    
 
     // Setup image buttons
     playPauseButton.setImages(true, true, true, playImage, 1.0f, {}, playImage, 0.8f, {}, playImage, 0.5f, {});
@@ -25,6 +26,11 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
 
     addAndMakeVisible(goToEndButton);
     goToEndButton.addListener(this);
+
+    muteButton.setButtonText("Unmuted");
+    muteButton.addListener(this);
+    addAndMakeVisible(muteButton);
+
     // === MODIFICATION END ===
 
     // Configure and add the volume slider
@@ -60,6 +66,7 @@ void PlayerGUI::resized()
     goToEndButton.setBounds(playPauseButton.getRight() + margin, yPos, buttonWidth, buttonHeight);
 
     volumeSlider.setBounds(margin, yPos + buttonHeight + margin, getWidth() - (margin * 2), 30);
+    muteButton.setBounds(380, 20, 80, 40);
 }
 
 void PlayerGUI::timerCallback()
@@ -102,6 +109,17 @@ void PlayerGUI::buttonClicked(juce::Button* button)
     {
         playerAudio.goToEnd();
     }
+
+    if (button == &muteButton) {
+        playerAudio.SwitchMute();
+       
+        if (playerAudio.GetMuteState()) {
+            muteButton.setButtonText("Muted");
+        }
+        else {
+            muteButton.setButtonText("Unmuted");
+        }
+    }
 }
 
 void PlayerGUI::updatePlayPauseButton()
@@ -125,3 +143,5 @@ void PlayerGUI::sliderValueChanged(juce::Slider* slider)
         playerAudio.setGain((float)slider->getValue());
     }
 }
+
+

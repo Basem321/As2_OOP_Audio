@@ -20,7 +20,17 @@ public:
     void setGain(float gain);
     bool isPlaying() const;
 
+    //feature 3 mute button functions
+
+    void SwitchMute();
+    bool GetMuteState();
+
 private:
+
+    //feature 3 mute button variables
+    bool Muted = false;
+    float PreviousVolume = 1.0f;
+
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
     juce::AudioTransportSource transportSource;

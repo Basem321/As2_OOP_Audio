@@ -69,3 +69,26 @@ bool PlayerAudio::isPlaying() const
 {
     return transportSource.isPlaying();
 }
+
+//feature 3
+
+void PlayerAudio::SwitchMute()
+{
+    if (Muted) {
+
+        transportSource.setGain(PreviousVolume);
+        Muted = false;
+    }
+    else
+    {
+        PreviousVolume = transportSource.getGain();
+        transportSource.setGain(0.0f);
+        Muted = true;
+    }
+}
+
+bool PlayerAudio::GetMuteState()
+{
+
+    return Muted;
+}
