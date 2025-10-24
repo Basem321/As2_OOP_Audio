@@ -28,7 +28,8 @@ private:
 
     //feature 3 mute button
     juce::TextButton muteButton{ "mute" };
-
+    //feature 4 repeat button
+    juce::TextButton repeatButton{ "repeat" };
     //================== Helpers ==================
     // This function now updates the play/pause button's image based on the audio state
     void updatePlayPauseButton();

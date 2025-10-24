@@ -37,6 +37,7 @@ void PlayerAudio::loadFile(const juce::File& file)
 
         // Start playback
         play();
+		readerSource->setLooping(rp);
     }
 }
 
@@ -85,6 +86,20 @@ void PlayerAudio::SwitchMute()
         transportSource.setGain(0.0f);
         Muted = true;
     }
+}
+void PlayerAudio::switchrepeat()
+{
+    rp = !rp;
+
+    if (readerSource)
+    {
+        readerSource->setLooping(rp);
+    }
+}
+
+bool PlayerAudio::GetRepeatState() const
+{
+    return rp;
 }
 
 bool PlayerAudio::GetMuteState()

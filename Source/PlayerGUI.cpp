@@ -31,6 +31,9 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
     muteButton.addListener(this);
     addAndMakeVisible(muteButton);
 
+    repeatButton.setButtonText("click to repeat");
+    repeatButton.addListener(this);
+    addAndMakeVisible(repeatButton);
     // === MODIFICATION END ===
 
     // Configure and add the volume slider
@@ -67,6 +70,8 @@ void PlayerGUI::resized()
 
     volumeSlider.setBounds(margin, yPos + buttonHeight + margin, getWidth() - (margin * 2), 30);
     muteButton.setBounds(380, 20, 80, 40);
+	repeatButton.setBounds(muteButton.getRight()+margin, 20, 100, 40);
+
 }
 
 void PlayerGUI::timerCallback()
@@ -110,7 +115,7 @@ void PlayerGUI::buttonClicked(juce::Button* button)
         playerAudio.goToEnd();
     }
 
-    if (button == &muteButton) {
+    else if (button == &muteButton) {
         playerAudio.SwitchMute();
        
         if (playerAudio.GetMuteState()) {
@@ -118,6 +123,16 @@ void PlayerGUI::buttonClicked(juce::Button* button)
         }
         else {
             muteButton.setButtonText("Unmuted");
+        }
+    }
+    else if (button == &repeatButton) {
+        playerAudio.switchrepeat();
+
+        if (playerAudio.GetRepeatState()) {
+            repeatButton.setButtonText("is being repeated");
+        }
+        else {
+            repeatButton.setButtonText("click to repeat");
         }
     }
 }
