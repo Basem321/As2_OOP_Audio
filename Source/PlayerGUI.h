@@ -13,9 +13,6 @@ public:
     PlayerGUI(PlayerAudio& audio);
     ~PlayerGUI() override;
 
-    
-    
-
     //================== Component Overrides ==================
     void paint(juce::Graphics& g) override;
     void resized() override;
@@ -26,13 +23,11 @@ private:
     void buttonClicked(juce::Button* button) override;
     void sliderValueChanged(juce::Slider* slider) override;
 
-    //feature 3 mute button
-    juce::TextButton muteButton{ "mute" };
-    //feature 4 repeat button
-    juce::TextButton repeatButton{ "repeat" };
     //================== Helpers ==================
     // This function now updates the play/pause button's image based on the audio state
     void updatePlayPauseButton();
+
+    void updateTrackInfo(); // Function to update our new label
 
     // Reference to our audio engine
     PlayerAudio& playerAudio;
@@ -45,7 +40,15 @@ private:
     juce::ImageButton goToStartButton;
     juce::ImageButton goToEndButton;
 
+    //feature 3 mute button
+    juce::TextButton muteButton{ "mute" };
+    //feature 4 repeat button
+    juce::TextButton repeatButton{ "repeat" };
+
     juce::Slider volumeSlider;
+
+    //feature 5
+    juce::Label trackInfoLabel;
 
     std::unique_ptr<juce::FileChooser> fileChooser;
 

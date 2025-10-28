@@ -8,7 +8,7 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
     pauseImage = juce::ImageCache::getFromMemory(BinaryData::Pause_png, BinaryData::Pause_pngSize);
     toStartImage = juce::ImageCache::getFromMemory(BinaryData::GoToStart_png, BinaryData::GoToStart_pngSize);
     toEndImage = juce::ImageCache::getFromMemory(BinaryData::GoToEnd_png, BinaryData::GoToEnd_pngSize);
-    
+
 
     // Setup image buttons
     playPauseButton.setImages(true, true, true, playImage, 1.0f, {}, playImage, 0.8f, {}, playImage, 0.5f, {});
@@ -34,13 +34,18 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
     repeatButton.setButtonText("click to repeat");
     repeatButton.addListener(this);
     addAndMakeVisible(repeatButton);
-    // === MODIFICATION END ===
 
     // Configure and add the volume slider
     volumeSlider.setRange(0.0, 1.0, 0.01);
     volumeSlider.setValue(0.5);
     volumeSlider.addListener(this);
     addAndMakeVisible(volumeSlider);
+
+    // Set up the metadata label
+    trackInfoLabel.setText("No file loaded", juce::dontSendNotification);
+    trackInfoLabel.setJustificationType(juce::Justification::centred);
+    trackInfoLabel.setFont(14.0f);
+    addAndMakeVisible(trackInfoLabel);
 
     // Set initial gain
     playerAudio.setGain((float)volumeSlider.getValue());
@@ -63,15 +68,19 @@ void PlayerGUI::resized()
     int margin = 10;
     int yPos = 20;
 
+    // --- Top row of controls ---
     loadButton.setBounds(margin, yPos, 100, buttonHeight);
     goToStartButton.setBounds(loadButton.getRight() + margin, yPos, buttonWidth, buttonHeight);
     playPauseButton.setBounds(goToStartButton.getRight() + margin, yPos, buttonWidth, buttonHeight);
     goToEndButton.setBounds(playPauseButton.getRight() + margin, yPos, buttonWidth, buttonHeight);
+    muteButton.setBounds(goToEndButton.getRight() + margin, yPos, buttonWidth, buttonHeight);
+    repeatButton.setBounds(muteButton.getRight() + margin, yPos, 100, buttonHeight);
 
-    volumeSlider.setBounds(margin, yPos + buttonHeight + margin, getWidth() - (margin * 2), 30);
-    muteButton.setBounds(380, 20, 80, 40);
-	repeatButton.setBounds(muteButton.getRight()+margin, 20, 100, 40);
+    int yPosRow2 = yPos + buttonHeight + margin;
+    volumeSlider.setBounds(margin, yPosRow2, getWidth() - (margin * 2), 30);
 
+    int yPosRow3 = volumeSlider.getBottom() + margin;
+    trackInfoLabel.setBounds(margin, yPosRow3, getWidth() - (margin * 2), 25);
 }
 
 void PlayerGUI::timerCallback()
@@ -96,6 +105,7 @@ void PlayerGUI::buttonClicked(juce::Button* button)
                 if (file.existsAsFile())
                 {
                     playerAudio.loadFile(file);
+                    updateTrackInfo(); 
                 }
             });
     }
@@ -117,7 +127,7 @@ void PlayerGUI::buttonClicked(juce::Button* button)
 
     else if (button == &muteButton) {
         playerAudio.SwitchMute();
-       
+
         if (playerAudio.GetMuteState()) {
             muteButton.setButtonText("Muted");
         }
@@ -135,6 +145,17 @@ void PlayerGUI::buttonClicked(juce::Button* button)
             repeatButton.setButtonText("click to repeat");
         }
     }
+}
+// featrue 5
+void PlayerGUI::updateTrackInfo()
+{
+    juce::String title = playerAudio.getTrackTitle();
+    juce::String duration = playerAudio.getTrackDuration();
+
+    if (duration.isNotEmpty())
+        trackInfoLabel.setText(title + " (" + duration + ")", juce::dontSendNotification);
+    else
+        trackInfoLabel.setText(title, juce::dontSendNotification);
 }
 
 void PlayerGUI::updatePlayPauseButton()
@@ -158,5 +179,3 @@ void PlayerGUI::sliderValueChanged(juce::Slider* slider)
         playerAudio.setGain((float)slider->getValue());
     }
 }
-
-
