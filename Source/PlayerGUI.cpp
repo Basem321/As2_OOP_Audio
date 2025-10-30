@@ -41,7 +41,7 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
     volumeSlider.addListener(this);
     addAndMakeVisible(volumeSlider);
 
-    // Set up the metadata label
+	//feature 5 metadata label
     trackInfoLabel.setText("No file loaded", juce::dontSendNotification);
     trackInfoLabel.setJustificationType(juce::Justification::centred);
     trackInfoLabel.setFont(14.0f);
@@ -50,27 +50,8 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
     // Set initial gain
     playerAudio.setGain((float)volumeSlider.getValue());
 
-    // Start timer to update the play/pause button
     startTimerHz(10);
-
-    //ft 6
-    speedSlider.setRange(0.25, 2.0, 0.05);
-    speedSlider.setValue(1.0); 
-    speedSlider.setTextValueSuffix(" x");
-    speedSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
-    speedSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 80, 20);
-    speedLabel.setJustificationType(juce::Justification::centredRight);
-    speedSlider.addListener(this);
-    addAndMakeVisible(speedSlider);
-
-  
-    
-    speedLabel.attachToComponent(&speedSlider, true);
-    addAndMakeVisible(speedLabel);
-
-    }
-
-  
+}
 
 PlayerGUI::~PlayerGUI() {}
 
@@ -96,12 +77,8 @@ void PlayerGUI::resized()
 
     volumeSlider.setBounds(margin, yPos + buttonHeight + margin, getWidth() - (margin * 2), 30);
 
-    speedSlider.setBounds(margin , 60,getWidth() - (margin * 2) - 80, 150);
-    muteButton.setBounds(380, 20, 80, 40);
-	repeatButton.setBounds(muteButton.getRight()+margin, 20, 100, 40);
-    
-    
-
+	// metadata label
+    trackInfoLabel.setBounds(margin, 450, getWidth() - (margin * 2), 25);
 }
 
 void PlayerGUI::timerCallback()
@@ -126,7 +103,7 @@ void PlayerGUI::buttonClicked(juce::Button* button)
                 if (file.existsAsFile())
                 {
                     playerAudio.loadFile(file);
-                    updateTrackInfo(); 
+                    updateTrackInfo(); // for update metadata by basem
                 }
             });
     }
@@ -167,7 +144,7 @@ void PlayerGUI::buttonClicked(juce::Button* button)
         }
     }
 }
-// featrue 5
+// feature 5
 void PlayerGUI::updateTrackInfo()
 {
     juce::String title = playerAudio.getTrackTitle();
@@ -199,10 +176,4 @@ void PlayerGUI::sliderValueChanged(juce::Slider* slider)
     {
         playerAudio.setGain((float)slider->getValue());
     }
-
-    if (slider == &speedSlider) {
-        playerAudio.setPlaybackSpeed(slider->getValue());
-    }
 }
-
-

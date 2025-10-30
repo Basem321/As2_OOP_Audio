@@ -1,32 +1,27 @@
 ﻿#include "PlayerAudio.h"
 
-PlayerAudio::PlayerAudio(): resampleSource(&transportSource, false, 2)
+PlayerAudio::PlayerAudio()
 {
     formatManager.registerBasicFormats();
-   
 }
 
 void PlayerAudio::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
-   
-    resampleSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
+    transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
 void PlayerAudio::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
 {
-   
-    resampleSource.getNextAudioBlock(bufferToFill);
+    transportSource.getNextAudioBlock(bufferToFill);
 }
 
 void PlayerAudio::releaseResources()
 {
-   
-    resampleSource.releaseResources();
+    transportSource.releaseResources();
 }
 
 void PlayerAudio::loadFile(const juce::File& file)
 {
-    // Stop current playback and release old source
     transportSource.stop();
     transportSource.setSource(nullptr);
     readerSource.reset();
@@ -52,7 +47,7 @@ void PlayerAudio::loadFile(const juce::File& file)
             trackDuration = juce::String(minutes) + ":" + juce::String(seconds).paddedLeft('0', 2);
         }
 
-        // get titleee and artistsssssss
+        // get artisttttttttt
         const juce::StringPairArray& metadata = reader->metadataValues;
         juce::String title = metadata.getValue("title", {});
         juce::String artist = metadata.getValue("artist", {});
@@ -64,15 +59,12 @@ void PlayerAudio::loadFile(const juce::File& file)
         else if (artist.isNotEmpty())
             trackTitle = artist;
 
-        // if there is no data
+        // 3. If no metadata was found
         if (trackTitle.isEmpty())
             trackTitle = file.getFileNameWithoutExtension();
 
         play();
-		readerSource->setLooping(rp);
-
-   
-       
+        readerSource->setLooping(rp);
     }
 }
 
@@ -131,19 +123,6 @@ void PlayerAudio::switchrepeat()
         readerSource->setLooping(rp);
     }
 }
-
-//ft 6
-void PlayerAudio::setPlaybackSpeed(double speed)
-{
-    resampleSource.setResamplingRatio(speed);
-}
-
-double PlayerAudio::getPlaybackSpeed()
-{
-    return resampleSource.getResamplingRatio();
-}
-//ft 6
-
 
 bool PlayerAudio::GetRepeatState() const
 {

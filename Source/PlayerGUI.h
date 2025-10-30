@@ -1,8 +1,6 @@
 #pragma once
 #include <JuceHeader.h>
-#include "PlayerAudio.h" // Include the audio engine
-
-// This file was modified to use ImageButtons instead of TextButtons.
+#include "PlayerAudio.h" 
 
 class PlayerGUI : public juce::Component,
     public juce::Button::Listener,
@@ -13,8 +11,6 @@ public:
     PlayerGUI(PlayerAudio& audio);
     ~PlayerGUI() override;
 
-    
-
     //================== Component Overrides ==================
     void paint(juce::Graphics& g) override;
     void resized() override;
@@ -22,24 +18,20 @@ public:
 
 private:
     //================== Listener Overrides ==================
-    
     void buttonClicked(juce::Button* button) override;
     void sliderValueChanged(juce::Slider* slider) override;
-    
 
     //================== Helpers ==================
     // This function now updates the play/pause button's image based on the audio state
     void updatePlayPauseButton();
 
-    void updateTrackInfo(); // Function to update our new label
+    void updateTrackInfo();
 
-    // Reference to our audio engine
     PlayerAudio& playerAudio;
 
     // GUI elements
     juce::TextButton loadButton{ "Load File" };
 
-    // MODIFIED: Switched from TextButton to ImageButton
     juce::ImageButton playPauseButton;
     juce::ImageButton goToStartButton;
     juce::ImageButton goToEndButton;
@@ -51,17 +43,11 @@ private:
 
     juce::Slider volumeSlider;
 
-    //feature 5
-    juce::Label trackInfoLabel;
+	//feature 5 metadata label
+    juce::Label trackInfoLabel; 
 
     std::unique_ptr<juce::FileChooser> fileChooser;
 
-    //feature 6
-
-    juce::Slider speedSlider;
-    juce::Label speedLabel;
-
-    // ADDED: Member variables to hold the loaded button images
     juce::Image playImage;
     juce::Image pauseImage;
     juce::Image toStartImage;

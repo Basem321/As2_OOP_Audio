@@ -27,36 +27,22 @@ public:
     bool GetRepeatState() const;
     void switchrepeat();
 
-    //feture 5
-
+	//feature 5 metadata functions
     juce::String getTrackTitle() const;
     juce::String getTrackDuration() const;
-
-
-    //feature 6 variables
-
-    void setPlaybackSpeed(double speed);
-    double getPlaybackSpeed();
 
 private:
 
     //feature 3 mute button variables
     bool Muted = false;
     float PreviousVolume = 1.0f;
-
-
-	//feature 4 repeat button variables
+    //feature 4 repeat button variables
     bool rp = false;
-
-
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
     juce::AudioTransportSource transportSource;
 
-    //feature 6 
-    juce::ResamplingAudioSource resampleSource;
-
+	//feature 5 variables
     juce::String trackTitle;
     juce::String trackDuration;
-  
 };
