@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <JuceHeader.h>
 #include "PlayerAudio.h" // Include the audio engine
 
@@ -15,7 +15,6 @@ public:
 
     
     
-
     //================== Component Overrides ==================
     void paint(juce::Graphics& g) override;
     void resized() override;
@@ -25,6 +24,7 @@ private:
     //================== Listener Overrides ==================
     void buttonClicked(juce::Button* button) override;
     void sliderValueChanged(juce::Slider* slider) override;
+    
 
     //feature 3 mute button
     juce::TextButton muteButton{ "mute" };
@@ -48,6 +48,11 @@ private:
     juce::Slider volumeSlider;
 
     std::unique_ptr<juce::FileChooser> fileChooser;
+
+    //feature 6
+
+    juce::Slider speedSlider;
+    juce::Label speedLabel;
 
     // ADDED: Member variables to hold the loaded button images
     juce::Image playImage;

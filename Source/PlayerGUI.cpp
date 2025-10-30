@@ -1,4 +1,4 @@
-﻿#include "PlayerGUI.h"
+#include "PlayerGUI.h"
 #include "BinaryData.h"
 
 PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
@@ -47,7 +47,25 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
 
     // Start timer to update the play/pause button
     startTimerHz(10);
-}
+
+    //ft 6
+    speedSlider.setRange(0.25, 2.0, 0.05);
+    speedSlider.setValue(1.0); 
+    speedSlider.setTextValueSuffix(" x");
+    speedSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+    speedSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 80, 20);
+    speedLabel.setJustificationType(juce::Justification::centredRight);
+    speedSlider.addListener(this);
+    addAndMakeVisible(speedSlider);
+
+  
+    
+    speedLabel.attachToComponent(&speedSlider, true);
+    addAndMakeVisible(speedLabel);
+
+    }
+
+  
 
 PlayerGUI::~PlayerGUI() {}
 
@@ -69,8 +87,12 @@ void PlayerGUI::resized()
     goToEndButton.setBounds(playPauseButton.getRight() + margin, yPos, buttonWidth, buttonHeight);
 
     volumeSlider.setBounds(margin, yPos + buttonHeight + margin, getWidth() - (margin * 2), 30);
+
+    speedSlider.setBounds(margin , 60,getWidth() - (margin * 2) - 80, 150);
     muteButton.setBounds(380, 20, 80, 40);
 	repeatButton.setBounds(muteButton.getRight()+margin, 20, 100, 40);
+    
+    
 
 }
 
@@ -156,6 +178,10 @@ void PlayerGUI::sliderValueChanged(juce::Slider* slider)
     if (slider == &volumeSlider)
     {
         playerAudio.setGain((float)slider->getValue());
+    }
+
+    if (slider == &speedSlider) {
+        playerAudio.setPlaybackSpeed(slider->getValue());
     }
 }
 

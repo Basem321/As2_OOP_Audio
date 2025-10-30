@@ -28,14 +28,30 @@ public:
 	bool GetRepeatState() const;
     void switchrepeat();
 
+  
+
+
+    //feature 6 variables
+
+    void setPlaybackSpeed(double speed);
+    double getPlaybackSpeed();
+
 private:
 
     //feature 3 mute button variables
     bool Muted = false;
     float PreviousVolume = 1.0f;
+
+
 	//feature 4 repeat button variables
     bool rp = false;
+
+
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
     juce::AudioTransportSource transportSource;
+
+    //feature 6 
+    juce::ResamplingAudioSource resampleSource;
+  
 };
