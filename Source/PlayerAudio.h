@@ -27,7 +27,10 @@ public:
     bool GetRepeatState() const;
     void switchrepeat();
 
-  
+    //feture 5
+
+    juce::String getTrackTitle() const;
+    juce::String getTrackDuration() const;
 
 
     //feature 6 variables
@@ -52,5 +55,8 @@ private:
 
     //feature 6 
     juce::ResamplingAudioSource resampleSource;
+
+    juce::String trackTitle;
+    juce::String trackDuration;
   
 };
