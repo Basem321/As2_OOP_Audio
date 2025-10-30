@@ -31,6 +31,12 @@ public:
     juce::String getTrackTitle() const;
     juce::String getTrackDuration() const;
 
+
+    //feature 6 variables
+
+    void setPlaybackSpeed(double speed);
+    double getPlaybackSpeed();
+
 private:
 
     //feature 3 mute button variables
@@ -45,4 +51,10 @@ private:
 	//feature 5 variables
     juce::String trackTitle;
     juce::String trackDuration;
+
+    //feature 6 functions
+    juce::ResamplingAudioSource resampleSource;
+
+
+    
 };

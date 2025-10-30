@@ -51,6 +51,21 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
     playerAudio.setGain((float)volumeSlider.getValue());
 
     startTimerHz(10);
+
+    //feature 6
+    speedSlider.setRange(0.25, 2.0, 0.05);
+    speedSlider.setValue(1.0);
+    speedSlider.setTextValueSuffix(" x");
+    speedSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+    speedSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 80, 20);
+    speedLabel.setJustificationType(juce::Justification::centredRight);
+    speedSlider.addListener(this);
+    addAndMakeVisible(speedSlider);
+
+
+
+    speedLabel.attachToComponent(&speedSlider, true);
+    addAndMakeVisible(speedLabel);
 }
 
 PlayerGUI::~PlayerGUI() {}
@@ -79,6 +94,9 @@ void PlayerGUI::resized()
 
 	// metadata label
     trackInfoLabel.setBounds(margin, 450, getWidth() - (margin * 2), 25);
+
+
+    speedSlider.setBounds(margin, 60, getWidth() - (margin * 2) - 80, 150);
 }
 
 void PlayerGUI::timerCallback()
@@ -175,5 +193,10 @@ void PlayerGUI::sliderValueChanged(juce::Slider* slider)
     if (slider == &volumeSlider)
     {
         playerAudio.setGain((float)slider->getValue());
+    }
+
+    if (slider == &speedSlider)
+    {
+        playerAudio.setPlaybackSpeed((float)slider->getValue());
     }
 }

@@ -1,23 +1,23 @@
 ﻿#include "PlayerAudio.h"
 
-PlayerAudio::PlayerAudio()
+PlayerAudio::PlayerAudio():resampleSource(&transportSource, false, 2)
 {
     formatManager.registerBasicFormats();
 }
 
 void PlayerAudio::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
-    transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
+    resampleSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
 void PlayerAudio::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
 {
-    transportSource.getNextAudioBlock(bufferToFill);
+    resampleSource.getNextAudioBlock(bufferToFill);
 }
 
 void PlayerAudio::releaseResources()
 {
-    transportSource.releaseResources();
+    resampleSource.releaseResources();
 }
 
 void PlayerAudio::loadFile(const juce::File& file)
@@ -143,4 +143,15 @@ juce::String PlayerAudio::getTrackTitle() const
 juce::String PlayerAudio::getTrackDuration() const
 {
     return trackDuration;
+}
+
+//ft 6
+void PlayerAudio::setPlaybackSpeed(double speed)
+{
+    resampleSource.setResamplingRatio(speed);
+}
+
+double PlayerAudio::getPlaybackSpeed()
+{
+    return resampleSource.getResamplingRatio();
 }

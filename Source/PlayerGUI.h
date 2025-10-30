@@ -46,6 +46,12 @@ private:
 	//feature 5 metadata label
     juce::Label trackInfoLabel; 
 
+
+    //feature 6 
+    juce::Slider speedSlider;
+    juce::Label speedLabel;
+
+
     std::unique_ptr<juce::FileChooser> fileChooser;
 
     juce::Image playImage;
