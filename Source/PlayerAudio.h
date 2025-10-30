@@ -21,11 +21,10 @@ public:
     bool isPlaying() const;
 
     //feature 3  mute button functions
-
     void SwitchMute();
     bool GetMuteState();
-	//feature 4 repeat button functions
-	bool GetRepeatState() const;
+    //feature 4 repeat button functions
+    bool GetRepeatState() const;
     void switchrepeat();
 
   

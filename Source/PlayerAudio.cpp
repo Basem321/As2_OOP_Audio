@@ -31,6 +31,9 @@ void PlayerAudio::loadFile(const juce::File& file)
     transportSource.setSource(nullptr);
     readerSource.reset();
 
+    trackTitle.clear();
+    trackDuration.clear();
+
     if (auto* reader = formatManager.createReaderFor(file))
     {
         // Create a new reader source
@@ -39,7 +42,32 @@ void PlayerAudio::loadFile(const juce::File& file)
         // Attach it to the transport source
         transportSource.setSource(readerSource.get(), 0, nullptr, reader->sampleRate);
 
-        // Start playback
+        // --- Metadata Extraction ---
+		// get durationnnnnn
+        auto durationSeconds = transportSource.getLengthInSeconds();
+        if (durationSeconds > 0)
+        {
+            int minutes = static_cast<int>(durationSeconds) / 60;
+            int seconds = static_cast<int>(durationSeconds) % 60;
+            trackDuration = juce::String(minutes) + ":" + juce::String(seconds).paddedLeft('0', 2);
+        }
+
+        // get titleee and artistsssssss
+        const juce::StringPairArray& metadata = reader->metadataValues;
+        juce::String title = metadata.getValue("title", {});
+        juce::String artist = metadata.getValue("artist", {});
+
+        if (artist.isNotEmpty() && title.isNotEmpty())
+            trackTitle = artist + " - " + title;
+        else if (title.isNotEmpty())
+            trackTitle = title;
+        else if (artist.isNotEmpty())
+            trackTitle = artist;
+
+        // if there is no data
+        if (trackTitle.isEmpty())
+            trackTitle = file.getFileNameWithoutExtension();
+
         play();
 		readerSource->setLooping(rp);
 
@@ -50,22 +78,22 @@ void PlayerAudio::loadFile(const juce::File& file)
 
 void PlayerAudio::play()
 {
-        transportSource.start();
+    transportSource.start();
 }
 
 void PlayerAudio::pause()
 {
-        transportSource.stop();
+    transportSource.stop();
 }
 
 void PlayerAudio::goToStart()
 {
-        transportSource.setPosition(0.0);
+    transportSource.setPosition(0.0);
 }
 
 void PlayerAudio::goToEnd()
 {
-        transportSource.setPosition(transportSource.getLengthInSeconds());
+    transportSource.setPosition(transportSource.getLengthInSeconds());
 }
 
 void PlayerAudio::setGain(float gain)
@@ -126,4 +154,14 @@ bool PlayerAudio::GetMuteState()
 {
 
     return Muted;
+}
+
+juce::String PlayerAudio::getTrackTitle() const
+{
+    return trackTitle;
+}
+
+juce::String PlayerAudio::getTrackDuration() const
+{
+    return trackDuration;
 }
