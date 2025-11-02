@@ -42,12 +42,18 @@ public:
 
     void setPlaybackSpeed(double speed);
     double getPlaybackSpeed();
+    
 
     // feature 8
     juce::StringArray getTrackTitles() const;
     int getNumTracks() const;
     int getCurrentTrackIndex() const;
     bool isFinished() const;
+
+    // feature 9
+    double getCurrentPosition() const;
+    double getTotalLength() const;
+    void setPosition(double newPosition);
 
 private:
     void loadInternal(const juce::File& file); // feature 8 

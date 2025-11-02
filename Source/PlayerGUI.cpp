@@ -1,4 +1,4 @@
-#include "PlayerGUI.h"
+﻿#include "PlayerGUI.h"
 #include "BinaryData.h"
 
 PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
@@ -74,6 +74,21 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
     previousButton.addListener(this);
     addAndMakeVisible(nextButton);
     nextButton.addListener(this);
+
+    //feature 9
+
+    //position slider
+    positionSlider.setSliderStyle(juce::Slider::LinearBar);
+    positionSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    positionSlider.setRange(0.0, 1.0, 0.0); 
+    positionSlider.addListener(this);
+    addAndMakeVisible(positionSlider);
+
+    //Time Label
+    timeLabel.setText("0:00 / 0:00", juce::dontSendNotification);
+    timeLabel.setJustificationType(juce::Justification::centred);
+    timeLabel.setFont(12.0f);
+    addAndMakeVisible(timeLabel);
 }
 
 PlayerGUI::~PlayerGUI() {}
@@ -110,10 +125,58 @@ void PlayerGUI::resized()
     int trackInfoHeight = 25; 
     trackInfoLabel.setBounds(margin, getHeight() - trackInfoHeight - 5, getWidth() - (margin * 2), trackInfoHeight); 
     playlistBox.setBounds(margin, playlistY, getWidth() - (margin * 2), getHeight() - playlistY - trackInfoHeight - 15); 
+
+    ////
+    int sliderHeight = 30;
+
+    int fourthRowY = thirdRowY + sliderHeight + margin;
+    int timeLabelWidth = 80; 
+
+    timeLabel.setBounds(getWidth() - margin - timeLabelWidth, fourthRowY,timeLabelWidth, sliderHeight);                       
+
+    int positionSliderWidth = getWidth() - (margin * 3) - timeLabelWidth;
+    positionSlider.setBounds(margin,fourthRowY, positionSliderWidth, sliderHeight);  
 }
+
+//feature 9
+
+void PlayerGUI::updatePositionSlider()
+{
+    double currentPosition = playerAudio.getCurrentPosition();
+    double totalLength = playerAudio.getTotalLength();
+
+    if (totalLength > 0.0)
+    {
+        
+        positionSlider.setRange(0.0, totalLength, 0.0);
+        
+        positionSlider.setValue(currentPosition, juce::dontSendNotification);
+
+       
+        int currentMinutes = static_cast<int>(currentPosition) / 60;
+        int currentSeconds = static_cast<int>(currentPosition) % 60;
+        juce::String currentStr = juce::String(currentMinutes) + ":" + juce::String(currentSeconds).paddedLeft('0', 2);
+
+        int totalMinutes = static_cast<int>(totalLength) / 60;
+        int totalSeconds = static_cast<int>(totalLength) % 60;
+        juce::String totalStr = juce::String(totalMinutes) + ":" + juce::String(totalSeconds).paddedLeft('0', 2);
+
+        timeLabel.setText(currentStr + " / " + totalStr, juce::dontSendNotification);
+    }
+    else
+    {
+       
+        positionSlider.setRange(0.0, 1.0, 0.0);
+        positionSlider.setValue(0.0, juce::dontSendNotification);
+        timeLabel.setText("0:00 / 0:00", juce::dontSendNotification);
+    }
+}
+
 
 void PlayerGUI::timerCallback()
 {
+
+    updatePositionSlider();
     updatePlayPauseButton();
     // feature 8 
     if (playerAudio.getNumTracks() > 0)
@@ -129,6 +192,8 @@ void PlayerGUI::timerCallback()
             updateTrackInfo();
         }
     }
+   
+
 }
 
 void PlayerGUI::buttonClicked(juce::Button* button)
@@ -231,10 +296,20 @@ void PlayerGUI::sliderValueChanged(juce::Slider* slider)
         playerAudio.setGain((float)slider->getValue());
     }
 
-    if (slider == &speedSlider)
+    else if (slider == &speedSlider)
     {
         playerAudio.setPlaybackSpeed((float)slider->getValue());
     }
+
+    else if (slider == &positionSlider)
+    {
+        
+        if (slider->isMouseButtonDown())
+        {
+            playerAudio.setPosition(slider->getValue());
+        }
+    }
+
 }
 
 // feature 8

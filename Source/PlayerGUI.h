@@ -33,6 +33,10 @@ private:
 
     void updateTrackInfo();
 
+    //feature 9
+
+    void updatePositionSlider();
+
     PlayerAudio& playerAudio;
 
     // GUI elements
@@ -61,6 +65,11 @@ private:
     juce::ListBox playlistBox;
     juce::TextButton previousButton{ "<<" };
     juce::TextButton nextButton{ ">>" };
+
+    //feature 9
+
+    juce::Slider positionSlider;
+    juce::Label timeLabel;
 
     std::unique_ptr<juce::FileChooser> fileChooser;
 

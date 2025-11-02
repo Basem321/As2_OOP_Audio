@@ -165,6 +165,9 @@ void PlayerAudio::SwitchMute()
         Muted = true;
     }
 }
+
+
+
 void PlayerAudio::switchrepeat()
 {
     rp = !rp;
@@ -196,7 +199,7 @@ juce::String PlayerAudio::getTrackDuration() const
     return trackDuration;
 }
 
-//ft 6
+//feature 6
 void PlayerAudio::setPlaybackSpeed(double speed)
 {
     resampleSource.setResamplingRatio(speed);
@@ -206,6 +209,8 @@ double PlayerAudio::getPlaybackSpeed()
 {
     return resampleSource.getResamplingRatio();
 }
+
+
 
 // feature 8
 juce::StringArray PlayerAudio::getTrackTitles() const
@@ -238,4 +243,21 @@ bool PlayerAudio::isFinished() const
         return transportSource.getCurrentPosition() >= transportSource.getLengthInSeconds() - 0.01;
     }
     return false;
+}
+
+// feature 9 
+
+double PlayerAudio::getCurrentPosition() const
+{
+    return transportSource.getCurrentPosition();
+}
+
+double PlayerAudio::getTotalLength() const
+{
+    return transportSource.getLengthInSeconds();
+}
+
+void PlayerAudio::setPosition(double newPosition)
+{
+    transportSource.setPosition(newPosition);
 }
