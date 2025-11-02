@@ -13,12 +13,18 @@ public:
 
     //================== Transport Controls ==================
     void loadFile(const juce::File& file);
+    void loadFiles(const juce::Array<juce::File>& files); // feature 8
     void play();
     void pause();
     void goToStart();
     void goToEnd();
     void setGain(float gain);
     bool isPlaying() const;
+
+    // feature 8 
+    void playNext();
+    void playPrevious();
+    void playTrack(int index);
 
     //feature 3  mute button functions
     void SwitchMute();
@@ -27,7 +33,7 @@ public:
     bool GetRepeatState() const;
     void switchrepeat();
 
-	//feature 5 metadata functions
+    //feature 5 metadata functions
     juce::String getTrackTitle() const;
     juce::String getTrackDuration() const;
 
@@ -37,7 +43,18 @@ public:
     void setPlaybackSpeed(double speed);
     double getPlaybackSpeed();
 
+    // feature 8
+    juce::StringArray getTrackTitles() const;
+    int getNumTracks() const;
+    int getCurrentTrackIndex() const;
+    bool isFinished() const;
+
 private:
+    void loadInternal(const juce::File& file); // feature 8 
+
+    // feature 8
+    juce::Array<juce::File> playlist;
+    int currentTrackIndex = -1;
 
     //feature 3 mute button variables
     bool Muted = false;
@@ -48,13 +65,10 @@ private:
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
     juce::AudioTransportSource transportSource;
 
-	//feature 5 variables
+    //feature 5 variables
     juce::String trackTitle;
     juce::String trackDuration;
 
     //feature 6 functions
     juce::ResamplingAudioSource resampleSource;
-
-
-    
 };

@@ -5,7 +5,8 @@
 class PlayerGUI : public juce::Component,
     public juce::Button::Listener,
     public juce::Slider::Listener,
-    public juce::Timer
+    public juce::Timer,
+    public juce::ListBoxModel // feature 8
 {
 public:
     PlayerGUI(PlayerAudio& audio);
@@ -21,6 +22,11 @@ private:
     void buttonClicked(juce::Button* button) override;
     void sliderValueChanged(juce::Slider* slider) override;
 
+    // feature 8
+    int getNumRows() override;
+    void paintListBoxItem(int rowNumber, juce::Graphics& g, int width, int height, bool rowIsSelected) override;
+    void listBoxItemDoubleClicked(int row, const juce::MouseEvent& event) override;
+
     //================== Helpers ==================
     // This function now updates the play/pause button's image based on the audio state
     void updatePlayPauseButton();
@@ -30,7 +36,7 @@ private:
     PlayerAudio& playerAudio;
 
     // GUI elements
-    juce::TextButton loadButton{ "Load File" };
+    juce::TextButton loadButton{ "Load Files" }; 
 
     juce::ImageButton playPauseButton;
     juce::ImageButton goToStartButton;
@@ -43,14 +49,18 @@ private:
 
     juce::Slider volumeSlider;
 
-	//feature 5 metadata label
-    juce::Label trackInfoLabel; 
+    //feature 5 metadata label
+    juce::Label trackInfoLabel;
 
 
     //feature 6 
     juce::Slider speedSlider;
     juce::Label speedLabel;
 
+    // feature 8 
+    juce::ListBox playlistBox;
+    juce::TextButton previousButton{ "<<" };
+    juce::TextButton nextButton{ ">>" };
 
     std::unique_ptr<juce::FileChooser> fileChooser;
 

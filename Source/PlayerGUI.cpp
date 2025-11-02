@@ -41,7 +41,7 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
     volumeSlider.addListener(this);
     addAndMakeVisible(volumeSlider);
 
-	//feature 5 metadata label
+    //feature 5 metadata label
     trackInfoLabel.setText("No file loaded", juce::dontSendNotification);
     trackInfoLabel.setJustificationType(juce::Justification::centred);
     trackInfoLabel.setFont(14.0f);
@@ -66,6 +66,14 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
 
     speedLabel.attachToComponent(&speedSlider, true);
     addAndMakeVisible(speedLabel);
+
+    // feature 8
+    addAndMakeVisible(playlistBox);
+    playlistBox.setModel(this);
+    addAndMakeVisible(previousButton);
+    previousButton.addListener(this);
+    addAndMakeVisible(nextButton);
+    nextButton.addListener(this);
 }
 
 PlayerGUI::~PlayerGUI() {}
@@ -77,31 +85,50 @@ void PlayerGUI::paint(juce::Graphics& g)
 
 void PlayerGUI::resized()
 {
-    int buttonWidth = 80;
+    int buttonWidth = 60; 
     int buttonHeight = 40;
     int margin = 10;
-    int yPos = 20;
+    int topRowY = 10; 
 
     // --- Top row of controls ---
-    loadButton.setBounds(margin, yPos, 100, buttonHeight);
-    goToStartButton.setBounds(loadButton.getRight() + margin, yPos, buttonWidth, buttonHeight);
-    playPauseButton.setBounds(goToStartButton.getRight() + margin, yPos, buttonWidth, buttonHeight);
-    goToEndButton.setBounds(playPauseButton.getRight() + margin, yPos, buttonWidth, buttonHeight);
-    muteButton.setBounds(goToEndButton.getRight() + margin, yPos, buttonWidth, buttonHeight);
-    repeatButton.setBounds(muteButton.getRight() + margin, yPos, 100, buttonHeight);
+    loadButton.setBounds(margin, topRowY, 100, buttonHeight);
+    previousButton.setBounds(loadButton.getRight() + margin, topRowY, buttonWidth, buttonHeight); 
+    goToStartButton.setBounds(previousButton.getRight() + margin, topRowY, buttonWidth, buttonHeight); 
+    playPauseButton.setBounds(goToStartButton.getRight() + margin, topRowY, buttonWidth, buttonHeight); 
+    goToEndButton.setBounds(playPauseButton.getRight() + margin, topRowY, buttonWidth, buttonHeight); 
+    nextButton.setBounds(goToEndButton.getRight() + margin, topRowY, buttonWidth, buttonHeight); 
+    muteButton.setBounds(nextButton.getRight() + margin, topRowY, 80, buttonHeight); 
+    repeatButton.setBounds(muteButton.getRight() + margin, topRowY, 100, buttonHeight); 
 
-    volumeSlider.setBounds(margin, yPos + buttonHeight + margin, getWidth() - (margin * 2), 30);
+    int secondRowY = topRowY + buttonHeight + margin; 
+    volumeSlider.setBounds(margin, secondRowY, getWidth() - (margin * 2), 30); 
 
-	// metadata label
-    trackInfoLabel.setBounds(margin, 450, getWidth() - (margin * 2), 25);
+    int thirdRowY = secondRowY + 4 * margin; 
+    speedSlider.setBounds(margin, thirdRowY, getWidth() - (margin * 2), 30); 
 
-
-    speedSlider.setBounds(margin, 60, getWidth() - (margin * 2) - 80, 150);
+    int playlistY = thirdRowY + 20* margin; 
+    int trackInfoHeight = 25; 
+    trackInfoLabel.setBounds(margin, getHeight() - trackInfoHeight - 5, getWidth() - (margin * 2), trackInfoHeight); 
+    playlistBox.setBounds(margin, playlistY, getWidth() - (margin * 2), getHeight() - playlistY - trackInfoHeight - 15); 
 }
 
 void PlayerGUI::timerCallback()
 {
     updatePlayPauseButton();
+    // feature 8 
+    if (playerAudio.getNumTracks() > 0)
+    {
+        if (playerAudio.isFinished() && !playerAudio.GetRepeatState())
+        {
+            playerAudio.playNext();
+        }
+
+        if (playlistBox.getSelectedRow() != playerAudio.getCurrentTrackIndex())
+        {
+            playlistBox.selectRow(playerAudio.getCurrentTrackIndex());
+            updateTrackInfo();
+        }
+    }
 }
 
 void PlayerGUI::buttonClicked(juce::Button* button)
@@ -109,19 +136,21 @@ void PlayerGUI::buttonClicked(juce::Button* button)
     if (button == &loadButton)
     {
         fileChooser = std::make_unique<juce::FileChooser>(
-            "Select an audio file...",
+            "Select audio files...", // feature 8
             juce::File{},
             "*.wav;*.mp3");
 
         fileChooser->launchAsync(
-            juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles,
+            juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::canSelectMultipleItems, // feature 8
             [this](const juce::FileChooser& fc)
             {
-                auto file = fc.getResult();
-                if (file.existsAsFile())
+                auto files = fc.getResults(); // feature 8
+                if (!files.isEmpty()) // feature 8
                 {
-                    playerAudio.loadFile(file);
-                    updateTrackInfo(); // for update metadata by basem
+                    playerAudio.loadFiles(files); // feature 8
+                    playlistBox.updateContent(); // feature 8
+                    playlistBox.selectRow(0); // feature 8
+                    updateTrackInfo();
                 }
             });
     }
@@ -140,7 +169,14 @@ void PlayerGUI::buttonClicked(juce::Button* button)
     {
         playerAudio.goToEnd();
     }
-
+    else if (button == &previousButton) // feature 8
+    {
+        playerAudio.playPrevious();
+    }
+    else if (button == &nextButton) // feature 8
+    {
+        playerAudio.playNext();
+    }
     else if (button == &muteButton) {
         playerAudio.SwitchMute();
 
@@ -199,4 +235,41 @@ void PlayerGUI::sliderValueChanged(juce::Slider* slider)
     {
         playerAudio.setPlaybackSpeed((float)slider->getValue());
     }
+}
+
+// feature 8
+int PlayerGUI::getNumRows()
+{
+    return playerAudio.getNumTracks();
+}
+
+// feature 8
+void PlayerGUI::paintListBoxItem(int rowNumber, juce::Graphics& g, int width, int height, bool rowIsSelected)
+{
+    if (rowIsSelected)
+    {
+        g.fillAll(juce::Colours::lightblue);
+    }
+
+    g.setColour(juce::Colours::black);
+    g.setFont(14.0f);
+
+    auto trackTitles = playerAudio.getTrackTitles();
+    if (rowNumber < trackTitles.size())
+    {
+        // Highlight the current playing track
+        if (rowNumber == playerAudio.getCurrentTrackIndex())
+        {
+            g.setColour(juce::Colours::orange);
+            g.setFont(juce::Font(14.0f, juce::Font::bold));
+        }
+
+        g.drawText(trackTitles[rowNumber], 5, 0, width - 10, height, juce::Justification::centredLeft, true);
+    }
+}
+
+// feature 8 
+void PlayerGUI::listBoxItemDoubleClicked(int row, const juce::MouseEvent&)
+{
+    playerAudio.playTrack(row);
 }

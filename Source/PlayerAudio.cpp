@@ -1,6 +1,6 @@
 ﻿#include "PlayerAudio.h"
 
-PlayerAudio::PlayerAudio():resampleSource(&transportSource, false, 2)
+PlayerAudio::PlayerAudio() :resampleSource(&transportSource, false, 2)
 {
     formatManager.registerBasicFormats();
 }
@@ -20,7 +20,8 @@ void PlayerAudio::releaseResources()
     resampleSource.releaseResources();
 }
 
-void PlayerAudio::loadFile(const juce::File& file)
+// feature 8 
+void PlayerAudio::loadInternal(const juce::File& file)
 {
     transportSource.stop();
     transportSource.setSource(nullptr);
@@ -38,7 +39,7 @@ void PlayerAudio::loadFile(const juce::File& file)
         transportSource.setSource(readerSource.get(), 0, nullptr, reader->sampleRate);
 
         // --- Metadata Extraction ---
-		// get durationnnnnn
+        // get durationnnnnn
         auto durationSeconds = transportSource.getLengthInSeconds();
         if (durationSeconds > 0)
         {
@@ -68,6 +69,26 @@ void PlayerAudio::loadFile(const juce::File& file)
     }
 }
 
+void PlayerAudio::loadFile(const juce::File& file)
+{
+    playlist.clear(); // feature 8
+    playlist.add(file); // feature 8
+    currentTrackIndex = 0; // feature 8
+    loadInternal(file); // feature 8
+}
+
+// feature 8
+void PlayerAudio::loadFiles(const juce::Array<juce::File>& files)
+{
+    playlist = files;
+    currentTrackIndex = 0;
+
+    if (playlist.size() > 0)
+    {
+        loadInternal(playlist.getUnchecked(0));
+    }
+}
+
 void PlayerAudio::play()
 {
     transportSource.start();
@@ -86,6 +107,36 @@ void PlayerAudio::goToStart()
 void PlayerAudio::goToEnd()
 {
     transportSource.setPosition(transportSource.getLengthInSeconds());
+}
+
+// feature 8
+void PlayerAudio::playNext()
+{
+    if (playlist.size() > 0)
+    {
+        currentTrackIndex = (currentTrackIndex + 1) % playlist.size();
+        loadInternal(playlist.getUnchecked(currentTrackIndex));
+    }
+}
+
+// feature 8
+void PlayerAudio::playPrevious()
+{
+    if (playlist.size() > 0)
+    {
+        currentTrackIndex = (currentTrackIndex - 1 + playlist.size()) % playlist.size();
+        loadInternal(playlist.getUnchecked(currentTrackIndex));
+    }
+}
+
+// feature 8
+void PlayerAudio::playTrack(int index)
+{
+    if (index >= 0 && index < playlist.size())
+    {
+        currentTrackIndex = index;
+        loadInternal(playlist.getUnchecked(currentTrackIndex));
+    }
 }
 
 void PlayerAudio::setGain(float gain)
@@ -154,4 +205,37 @@ void PlayerAudio::setPlaybackSpeed(double speed)
 double PlayerAudio::getPlaybackSpeed()
 {
     return resampleSource.getResamplingRatio();
+}
+
+// feature 8
+juce::StringArray PlayerAudio::getTrackTitles() const
+{
+    juce::StringArray titles;
+    for (const auto& file : playlist)
+    {
+        titles.add(file.getFileNameWithoutExtension());
+    }
+    return titles;
+}
+
+// feature 8
+int PlayerAudio::getNumTracks() const
+{
+    return playlist.size();
+}
+
+// feature 8
+int PlayerAudio::getCurrentTrackIndex() const
+{
+    return currentTrackIndex;
+}
+
+// feature 8
+bool PlayerAudio::isFinished() const
+{
+    if (transportSource.getLengthInSeconds() > 0)
+    {
+        return transportSource.getCurrentPosition() >= transportSource.getLengthInSeconds() - 0.01;
+    }
+    return false;
 }
