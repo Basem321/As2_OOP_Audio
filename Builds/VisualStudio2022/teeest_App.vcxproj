@@ -146,6 +146,7 @@
     <Lib/>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\AudioMixer.cpp"/>
     <ClCompile Include="..\..\Source\PlayerGUI.cpp"/>
     <ClCompile Include="..\..\Source\PlayerAudio.cpp"/>
     <ClCompile Include="..\..\Source\Main.cpp"/>
@@ -2844,6 +2845,7 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_gui_extra.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\AudioMixer.h"/>
     <ClInclude Include="..\..\Source\PlayerGUI.h"/>
     <ClInclude Include="..\..\Source\PlayerAudio.h"/>
     <ClInclude Include="..\..\Source\MainComponent.h"/>

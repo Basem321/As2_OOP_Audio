@@ -652,6 +652,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\AudioMixer.cpp">
+      <Filter>teeest\Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\PlayerGUI.cpp">
       <Filter>teeest\Source</Filter>
     </ClCompile>
@@ -3528,6 +3531,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\AudioMixer.h">
+      <Filter>teeest\Source</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\PlayerGUI.h">
       <Filter>teeest\Source</Filter>
     </ClInclude>

@@ -1,10 +1,16 @@
 ﻿#include "MainComponent.h"
 
-MainComponent::MainComponent()
-    : playerGUI(playerAudio) // Initialize GUI with a reference to the audio engine
+MainComponent::MainComponent():
+    playerAudio1(),
+    playerAudio2(),
+    playerGUI1(playerAudio1),
+    playerGUI2(playerAudio2),
+    audioMixer(playerAudio1, playerAudio2)
+    
 {
-    addAndMakeVisible(playerGUI);
-    setSize(500, 250);
+    addAndMakeVisible(playerGUI1);
+    addAndMakeVisible(playerGUI2);
+
     setAudioChannels(0, 2); // 0 inputs, 2 outputs
 }
 
@@ -16,19 +22,19 @@ MainComponent::~MainComponent()
 void MainComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
     // Pass the call to our audio engine
-    playerAudio.prepareToPlay(samplesPerBlockExpected, sampleRate);
+    audioMixer.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
 void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
 {
     // Pass the call to our audio engine
-    playerAudio.getNextAudioBlock(bufferToFill);
+    audioMixer.getNextAudioBlock(bufferToFill);
 }
 
 void MainComponent::releaseResources()
 {
     // Pass the call to our audio engine
-    playerAudio.releaseResources();
+    audioMixer.releaseResources();
 }
 
 void MainComponent::paint(juce::Graphics& g)
@@ -38,6 +44,7 @@ void MainComponent::paint(juce::Graphics& g)
 
 void MainComponent::resized()
 {
-    // Make the PlayerGUI component fill the entire MainComponent
-    playerGUI.setBounds(getLocalBounds());
+    auto bounds = getLocalBounds();
+    playerGUI1.setBounds(bounds.removeFromLeft(bounds.getWidth() / 2));
+    playerGUI2.setBounds(bounds);
 }

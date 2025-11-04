@@ -21,6 +21,9 @@ public:
     void setGain(float gain);
     bool isPlaying() const;
 
+    juce::AudioTransportSource& getTransportSource();
+    juce::ResamplingAudioSource& getResamplingSource();
+
     // feature 8 
     void playNext();
     void playPrevious();

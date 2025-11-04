@@ -2,6 +2,7 @@
 #include <JuceHeader.h>
 #include "PlayerAudio.h"
 #include "PlayerGUI.h"
+#include "AudioMixer.h"
 
 class MainComponent : public juce::AudioAppComponent
 {
@@ -19,8 +20,14 @@ public:
     void resized() override;
 
 private:
-    PlayerAudio playerAudio; // Owns the audio engine
-    PlayerGUI playerGUI;     // Owns the GUI, gives it a reference to the engine
+    PlayerAudio playerAudio1; 
+    PlayerAudio playerAudio2; 
+    AudioMixer audioMixer;    
+
+    PlayerGUI playerGUI1;
+    PlayerGUI playerGUI2;
+
+    
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

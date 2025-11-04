@@ -149,6 +149,16 @@ bool PlayerAudio::isPlaying() const
     return transportSource.isPlaying();
 }
 
+juce::AudioTransportSource& PlayerAudio::getTransportSource()
+{
+    return transportSource;
+}
+
+juce::ResamplingAudioSource& PlayerAudio::getResamplingSource()
+{
+    return resampleSource;
+}
+
 //feature 3
 
 void PlayerAudio::SwitchMute()
