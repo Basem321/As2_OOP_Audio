@@ -1,5 +1,12 @@
 #pragma once
+
+#if ! JUCE_MSVC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wredundant-decls"
+#endif
+
 #include <JuceHeader.h>
+#include "PlayerAudio.h"
 
 class PlayerAudio : public juce::AudioSource
 {
@@ -20,7 +27,6 @@ public:
     void goToEnd();
     void setGain(float gain);
     bool isPlaying() const;
-
     juce::AudioTransportSource& getTransportSource();
     juce::ResamplingAudioSource& getResamplingSource();
 
@@ -45,7 +51,7 @@ public:
 
     void setPlaybackSpeed(double speed);
     double getPlaybackSpeed();
-    
+
 
     // feature 8
     juce::StringArray getTrackTitles() const;
@@ -57,10 +63,14 @@ public:
     double getCurrentPosition() const;
     double getTotalLength() const;
     void setPosition(double newPosition);
+    //feature 10 loop section functions
+    void setLoopSection(double startTime, double endTime);
+    double getLoopStartTime() const;
+    double getLoopEndTime() const;
 
 private:
     void loadInternal(const juce::File& file); // feature 8 
-
+    std::unique_ptr<juce::AudioFormatReader> audioReader;
     // feature 8
     juce::Array<juce::File> playlist;
     int currentTrackIndex = -1;
@@ -77,7 +87,16 @@ private:
     //feature 5 variables
     juce::String trackTitle;
     juce::String trackDuration;
+    //feature 10 loop section variables
+    double loopStartTime = 0.0;
+    double loopEndTime = 0.0;
 
     //feature 6 functions
     juce::ResamplingAudioSource resampleSource;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerAudio)
 };
+
+#if ! JUCE_MSVC
+#pragma GCC diagnostic pop
+#endif

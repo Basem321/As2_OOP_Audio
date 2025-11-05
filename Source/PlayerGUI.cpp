@@ -119,7 +119,33 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
     timeLabel.setJustificationType(juce::Justification::centred);
     timeLabel.setFont(12.0f);
     addAndMakeVisible(timeLabel);
+    //feature 10 loop section sliders
+    loopStartSlider.setSliderStyle(juce::Slider::LinearHorizontal);
+    loopStartSlider.setTextBoxStyle(juce::Slider::TextBoxRight, false, 60, 20);
+    loopStartSlider.setRange(0.0, 100.0, 0.1);
+    loopStartSlider.setValue(0.0);
+    loopStartSlider.addListener(this);
+    addAndMakeVisible(loopStartSlider);
+
+    loopStartLabel.setText("Loop Start:", juce::dontSendNotification);
+    loopStartLabel.setJustificationType(juce::Justification::centredRight);
+    loopStartLabel.attachToComponent(&loopStartSlider, true);
+    addAndMakeVisible(loopStartLabel);
+
+    loopEndSlider.setSliderStyle(juce::Slider::LinearHorizontal);
+    loopEndSlider.setTextBoxStyle(juce::Slider::TextBoxRight, false, 60, 20);
+    loopEndSlider.setRange(0.0, 100.0, 0.1);
+    loopEndSlider.setValue(10.0);
+    loopEndSlider.addListener(this);
+    addAndMakeVisible(loopEndSlider);
+
+    loopEndLabel.setText("Loop End:", juce::dontSendNotification);
+    loopEndLabel.setJustificationType(juce::Justification::centredRight);
+    loopEndLabel.attachToComponent(&loopEndSlider, true);
+    addAndMakeVisible(loopEndLabel);
+
 }
+
 
 PlayerGUI::~PlayerGUI() {}
 
@@ -166,6 +192,22 @@ void PlayerGUI::resized()
 
     int positionSliderWidth = getWidth() - (margin * 3) - timeLabelWidth;
     positionSlider.setBounds(margin, fourthRowY, positionSliderWidth, sliderHeight);
+    //feature 10 loop section sliders
+    int fifthRowY = fourthRowY + sliderHeight + margin;
+    int labelWidth = 80;
+
+    loopStartSlider.setBounds(margin + labelWidth, fifthRowY,
+        getWidth() - (margin * 2) - labelWidth, sliderHeight);
+
+    int sixthRowY = fifthRowY + sliderHeight + margin;
+    loopEndSlider.setBounds(margin + labelWidth, sixthRowY,
+        getWidth() - (margin * 2) - labelWidth, sliderHeight);
+
+    // I will change the playlist box position ya shbab 
+    playlistY = sixthRowY + sliderHeight + margin;
+    playlistBox.setBounds(margin, playlistY, getWidth() - (margin * 2),
+        getHeight() - playlistY - trackInfoHeight - 15);
+
 }
 
 //feature 9
@@ -317,6 +359,15 @@ void PlayerGUI::updateTrackInfo()
         trackInfoLabel.setText(title + " (" + duration + ")", juce::dontSendNotification);
     else
         trackInfoLabel.setText(title, juce::dontSendNotification);
+    //feature 10 update loop slider ranges عشان لما يحمل تراك جديد ال لوب سلايدر يتحدثوا لوحدهم
+    double totalLength = playerAudio.getTotalLength();
+    if (totalLength > 0)
+    {
+        loopStartSlider.setRange(0.0, totalLength, 0.1);
+        loopEndSlider.setRange(0.0, totalLength, 0.1);
+        loopEndSlider.setValue(totalLength);
+        playerAudio.setLoopSection(0.0, totalLength);
+    }
 }
 
 void PlayerGUI::updatePlayPauseButton()
@@ -360,7 +411,27 @@ void PlayerGUI::sliderValueChanged(juce::Slider* slider)
             playerAudio.setPosition(slider->getValue());
         }
     }
+    //feature 10
+    else if (slider == &loopStartSlider || slider == &loopEndSlider)
+    {
+        // Ensure start is before end
+        if (loopStartSlider.getValue() >= loopEndSlider.getValue())
+        {
+            if (slider == &loopStartSlider)
+                loopStartSlider.setValue(loopEndSlider.getValue() - 0.1, juce::dontSendNotification);
+            else
+                loopEndSlider.setValue(loopStartSlider.getValue() + 0.1, juce::dontSendNotification);
+        }
 
+        playerAudio.setLoopSection(loopStartSlider.getValue(), loopEndSlider.getValue());
+
+        // Update button text if repeat is on
+        if (playerAudio.GetRepeatState())
+        {
+            repeatButton.setButtonText("Loop: " + juce::String(loopStartSlider.getValue(), 1) +
+                "s - " + juce::String(loopEndSlider.getValue(), 1) + "s");
+        }
+    }
 }
 
 // feature 8

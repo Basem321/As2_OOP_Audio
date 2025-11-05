@@ -15,7 +15,7 @@ namespace BinaryData
     const int            Pause_pngSize = 512;
 
     extern const char*   GoToEnd_png;
-    const int            GoToEnd_pngSize = 283;
+    const int            GoToEnd_pngSize = 376;
 
     extern const char*   GoToStart_png;
     const int            GoToStart_pngSize = 375;

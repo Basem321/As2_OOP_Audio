@@ -77,6 +77,11 @@ private:
     juce::Image pauseImage;
     juce::Image toStartImage;
     juce::Image toEndImage;
+    //feature 10 loop section sliders
+    juce::Slider loopStartSlider;
+    juce::Slider loopEndSlider;
+    juce::Label loopStartLabel;
+    juce::Label loopEndLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerGUI)
 };

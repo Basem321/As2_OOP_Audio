@@ -12,6 +12,21 @@ void PlayerAudio::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 
 void PlayerAudio::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
 {
+    if (rp && audioReader && loopEndTime > loopStartTime)
+    {
+        double sampleRate = audioReader->sampleRate;
+        long long startSample = static_cast<long long>(loopStartTime * sampleRate);
+        long long endSample = static_cast<long long>(loopEndTime * sampleRate);
+        double currentPosition = transportSource.getCurrentPosition();
+        long long currentSample = static_cast<long long>(currentPosition * sampleRate);
+
+        // If playback has reached or passed the loop end, jump to loop start
+        if (currentSample >= endSample)
+        {
+            transportSource.setPosition(loopStartTime);
+        }
+    }
+
     resampleSource.getNextAudioBlock(bufferToFill);
 }
 
@@ -26,12 +41,14 @@ void PlayerAudio::loadInternal(const juce::File& file)
     transportSource.stop();
     transportSource.setSource(nullptr);
     readerSource.reset();
+    audioReader.reset();
 
     trackTitle.clear();
     trackDuration.clear();
 
     if (auto* reader = formatManager.createReaderFor(file))
     {
+        audioReader.reset(reader);
         // Create a new reader source
         readerSource = std::make_unique<juce::AudioFormatReaderSource>(reader, true);
 
@@ -148,7 +165,6 @@ bool PlayerAudio::isPlaying() const
 {
     return transportSource.isPlaying();
 }
-
 juce::AudioTransportSource& PlayerAudio::getTransportSource()
 {
     return transportSource;
@@ -178,14 +194,20 @@ void PlayerAudio::SwitchMute()
 
 
 
+//feature 4 and feature 10
+
 void PlayerAudio::switchrepeat()
 {
     rp = !rp;
 
-    if (readerSource)
-    {
-        readerSource->setLooping(rp);
-    }
+
+
+
+
+
+
+
+
 }
 
 bool PlayerAudio::GetRepeatState() const
@@ -270,4 +292,32 @@ double PlayerAudio::getTotalLength() const
 void PlayerAudio::setPosition(double newPosition)
 {
     transportSource.setPosition(newPosition);
+}
+//feature 10
+
+void PlayerAudio::setLoopSection(double startTime, double endTime)
+{
+    loopStartTime = startTime;
+    loopEndTime = endTime;
+
+    if (rp && audioReader)
+    {
+        double sampleRate = audioReader->sampleRate;
+        if (sampleRate > 0)
+        {
+            long long startSample = static_cast<long long>(startTime * sampleRate);
+            long long endSample = static_cast<long long>(endTime * sampleRate);
+        }
+    }
+}
+
+
+double PlayerAudio::getLoopStartTime() const
+{
+    return loopStartTime;
+}
+
+double PlayerAudio::getLoopEndTime() const
+{
+    return loopEndTime;
 }
