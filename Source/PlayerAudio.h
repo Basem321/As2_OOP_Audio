@@ -94,6 +94,9 @@ private:
     //feature 6 functions
     juce::ResamplingAudioSource resampleSource;
 
+
+    juce::CriticalSection audioCallbackLock;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerAudio)
 };
 

@@ -7,11 +7,13 @@ PlayerAudio::PlayerAudio() :resampleSource(&transportSource, false, 2)
 
 void PlayerAudio::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
+    const juce::ScopedLock sl(audioCallbackLock);
     resampleSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
 void PlayerAudio::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
 {
+    const juce::ScopedLock sl(audioCallbackLock);
     if (rp && audioReader && loopEndTime > loopStartTime)
     {
         double sampleRate = audioReader->sampleRate;
@@ -32,16 +34,21 @@ void PlayerAudio::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferTo
 
 void PlayerAudio::releaseResources()
 {
+    const juce::ScopedLock sl(audioCallbackLock);
     resampleSource.releaseResources();
 }
 
 // feature 8 
 void PlayerAudio::loadInternal(const juce::File& file)
 {
+
     transportSource.stop();
-    transportSource.setSource(nullptr);
-    readerSource.reset();
-    audioReader.reset();
+    {
+        const juce::ScopedLock sl(audioCallbackLock);
+        transportSource.setSource(nullptr);
+        readerSource.reset();
+        audioReader.reset();
+    }
 
     trackTitle.clear();
     trackDuration.clear();
@@ -50,7 +57,7 @@ void PlayerAudio::loadInternal(const juce::File& file)
     {
         audioReader.reset(reader);
         // Create a new reader source
-        readerSource = std::make_unique<juce::AudioFormatReaderSource>(reader, true);
+        readerSource = std::make_unique<juce::AudioFormatReaderSource>(reader, false);
 
         // Attach it to the transport source
         transportSource.setSource(readerSource.get(), 0, nullptr, reader->sampleRate);
@@ -82,7 +89,7 @@ void PlayerAudio::loadInternal(const juce::File& file)
             trackTitle = file.getFileNameWithoutExtension();
 
         play();
-        readerSource->setLooping(rp);
+        readerSource->setLooping(false);
     }
 }
 
@@ -198,12 +205,8 @@ void PlayerAudio::SwitchMute()
 
 void PlayerAudio::switchrepeat()
 {
+    const juce::ScopedLock sl(audioCallbackLock);
     rp = !rp;
-
-
-
-
-
 
 
 
@@ -234,6 +237,7 @@ juce::String PlayerAudio::getTrackDuration() const
 //feature 6
 void PlayerAudio::setPlaybackSpeed(double speed)
 {
+    const juce::ScopedLock sl(audioCallbackLock);
     resampleSource.setResamplingRatio(speed);
 }
 
@@ -297,6 +301,7 @@ void PlayerAudio::setPosition(double newPosition)
 
 void PlayerAudio::setLoopSection(double startTime, double endTime)
 {
+    const juce::ScopedLock sl(audioCallbackLock);
     loopStartTime = startTime;
     loopEndTime = endTime;
 

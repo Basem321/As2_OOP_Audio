@@ -4,8 +4,8 @@ AudioMixer::AudioMixer(PlayerAudio& p1, PlayerAudio& p2)
     : player1(p1), player2(p2)
 {
    
-    mixerSource.addInputSource(&player1.getResamplingSource(), false);
-    mixerSource.addInputSource(&player2.getResamplingSource(), false);
+    mixerSource.addInputSource(&player1, false);
+    mixerSource.addInputSource(&player2, false);
 }
 
 void AudioMixer::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
