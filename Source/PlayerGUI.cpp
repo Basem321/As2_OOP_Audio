@@ -3,28 +3,16 @@
 
 PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
 {
-	// these are the colors used in the GUI design so i can use them frequently without rewriting the hex code each time done by " Basem(''_'') "
-    juce::Colour bgColour(0xFF1F1F2B); // Very Dark Blue
-    juce::Colour boxBgColour(0xFF282C34); // Dark Slate Grey
-    juce::Colour accentColour(0xFF00D8FF); // Bright Cyan            // and these  are the colors if we wanted to change anything
-    juce::Colour sliderTrackColour(0xFF3A4A5C); //Dark Blue-Grey
-    juce::Colour buttonColour(0xFF3A3A4A); // Charcoal
-    juce::Colour textColour(0xFFAAAAAA); // Light Grey 
-
     playImage = juce::ImageCache::getFromMemory(BinaryData::start_png, BinaryData::start_pngSize);
     pauseImage = juce::ImageCache::getFromMemory(BinaryData::Pause_png, BinaryData::Pause_pngSize);
     toStartImage = juce::ImageCache::getFromMemory(BinaryData::GoToStart_png, BinaryData::GoToStart_pngSize);
     toEndImage = juce::ImageCache::getFromMemory(BinaryData::GoToEnd_png, BinaryData::GoToEnd_pngSize);
 
-	//                                         normal state,              hover state,                   clicked state
-    playPauseButton.setImages(true, true, true,playImage, 1.0f, accentColour,playImage, 0.8f, accentColour,playImage, 0.5f, accentColour);
+    //                                         normal state,              hover state,                   clicked state
+    playPauseButton.setImages(true, true, true, playImage, 1.0f, juce::Colours::transparentBlack, playImage, 0.8f, juce::Colours::transparentBlack, playImage, 0.5f, juce::Colours::transparentBlack);
+    goToStartButton.setImages(true, true, true, toStartImage, 1.0f, juce::Colours::transparentBlack, toStartImage, 0.8f, juce::Colours::transparentBlack, toStartImage, 0.5f, juce::Colours::transparentBlack);
+    goToEndButton.setImages(true, true, true, toEndImage, 1.0f, juce::Colours::transparentBlack, toEndImage, 0.8f, juce::Colours::transparentBlack, toEndImage, 0.5f, juce::Colours::transparentBlack);
 
-    goToStartButton.setImages(true, true, true,toStartImage, 1.0f, textColour,toStartImage, 0.8f, textColour,toStartImage, 0.5f, textColour);
-
-    goToEndButton.setImages(true, true, true,toEndImage, 1.0f, textColour,toEndImage, 0.8f, textColour,toEndImage, 0.5f, textColour);
-
-    loadButton.setColour(juce::TextButton::buttonColourId, buttonColour);
-    loadButton.setColour(juce::TextButton::textColourOffId, textColour);
     addAndMakeVisible(loadButton);
     loadButton.addListener(this);
 
@@ -38,22 +26,15 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
     goToEndButton.addListener(this);
 
     muteButton.setButtonText("Unmuted");
-    muteButton.setColour(juce::TextButton::buttonColourId, buttonColour);
-    muteButton.setColour(juce::TextButton::textColourOffId, textColour);
     muteButton.addListener(this);
     addAndMakeVisible(muteButton);
 
     repeatButton.setButtonText("click to repeat");
-    repeatButton.setColour(juce::TextButton::buttonColourId, buttonColour);
-    repeatButton.setColour(juce::TextButton::textColourOffId, textColour);
     repeatButton.addListener(this);
     addAndMakeVisible(repeatButton);
 
     // Configure and add the volume slider
     volumeSlider.setSliderStyle(juce::Slider::LinearHorizontal);
-    volumeSlider.setColour(juce::Slider::thumbColourId, accentColour);
-    volumeSlider.setColour(juce::Slider::trackColourId, accentColour);
-    volumeSlider.setColour(juce::Slider::backgroundColourId, sliderTrackColour);
     volumeSlider.setRange(0.0, 1.0, 0.01);
     volumeSlider.setValue(0.5);
     volumeSlider.addListener(this);
@@ -63,7 +44,6 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
     trackInfoLabel.setText("No file loaded", juce::dontSendNotification);
     trackInfoLabel.setJustificationType(juce::Justification::centred);
     trackInfoLabel.setFont(14.0f);
-    trackInfoLabel.setColour(juce::Label::textColourId, textColour); 
     addAndMakeVisible(trackInfoLabel);
 
     // Set initial gain
@@ -72,10 +52,6 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
     startTimerHz(10);
 
     //feature 6
-    speedSlider.setColour(juce::Slider::thumbColourId, accentColour);
-    speedSlider.setColour(juce::Slider::trackColourId, accentColour);
-    speedSlider.setColour(juce::Slider::backgroundColourId, sliderTrackColour);
-    speedSlider.setColour(juce::Slider::textBoxTextColourId, textColour); 
     speedSlider.setRange(0.25, 2.0, 0.05);
     speedSlider.setValue(1.0);
     speedSlider.setTextValueSuffix(" x");
@@ -84,22 +60,16 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
     speedSlider.addListener(this);
     addAndMakeVisible(speedSlider);
 
-    speedLabel.setColour(juce::Label::textColourId, textColour);
     speedLabel.attachToComponent(&speedSlider, true);
     addAndMakeVisible(speedLabel);
 
     // feature 8
     addAndMakeVisible(playlistBox);
     playlistBox.setModel(this);
-    playlistBox.setColour(juce::ListBox::backgroundColourId, boxBgColour); 
 
-    previousButton.setColour(juce::TextButton::buttonColourId, buttonColour);
-    previousButton.setColour(juce::TextButton::textColourOffId, textColour);
     addAndMakeVisible(previousButton);
     previousButton.addListener(this);
 
-    nextButton.setColour(juce::TextButton::buttonColourId, buttonColour);
-    nextButton.setColour(juce::TextButton::textColourOffId, textColour);
     addAndMakeVisible(nextButton);
     nextButton.addListener(this);
 
@@ -107,18 +77,16 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
     //position slider
     positionSlider.setSliderStyle(juce::Slider::LinearBar);
     positionSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    positionSlider.setColour(juce::Slider::trackColourId, sliderTrackColour); 
-    positionSlider.setColour(juce::Slider::trackColourId, accentColour); 
     positionSlider.setRange(0.0, 1.0, 0.0);
     positionSlider.addListener(this);
     addAndMakeVisible(positionSlider);
 
     //Time Label
     timeLabel.setText("0:00 / 0:00", juce::dontSendNotification);
-    timeLabel.setColour(juce::Label::textColourId, textColour); 
     timeLabel.setJustificationType(juce::Justification::centred);
     timeLabel.setFont(12.0f);
     addAndMakeVisible(timeLabel);
+
     //feature 10 loop section sliders
     loopStartSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     loopStartSlider.setTextBoxStyle(juce::Slider::TextBoxRight, false, 60, 20);
@@ -144,6 +112,12 @@ PlayerGUI::PlayerGUI(PlayerAudio& audio) : playerAudio(audio)
     loopEndLabel.attachToComponent(&loopEndSlider, true);
     addAndMakeVisible(loopEndLabel);
 
+    // innovation feature
+    addAndMakeVisible(themeButton);
+    themeButton.addListener(this);
+
+    currentTheme = Default;
+    applyTheme();
 }
 
 
@@ -151,12 +125,123 @@ PlayerGUI::~PlayerGUI() {}
 
 void PlayerGUI::paint(juce::Graphics& g)
 {
-    g.fillAll(juce::Colour(0xFF1F1F2B)); // Set main background color
+    g.fillAll(bgColour); // Use the theme's background color
+}
+
+void PlayerGUI::applyTheme()
+{
+    switch (currentTheme)
+    {
+    case Girls:
+        bgColour = juce::Colour(0xFFFDEEF4); // Light Pink
+        boxBgColour = juce::Colour(0xFFFADADD); // Medium Pink
+        accentColour = juce::Colour(0xFFE1306C); // Strong Pink/Magenta
+        sliderTrackColour = juce::Colour(0xFFF8C8DC); // Lighter Pink
+        buttonColour = juce::Colour(0xFFF4ABC4); // Soft Pink
+        textColour = juce::Colour(0xFF5E2A3A); // Dark Purple/Brown
+        break;
+
+    case Boys:
+        bgColour = juce::Colour(0xFF1A2639); // Dark Blue
+        boxBgColour = juce::Colour(0xFF283747); // Dark Slate Blue
+        accentColour = juce::Colour(0xFF3498DB); // Bright Blue
+        sliderTrackColour = juce::Colour(0xFF5D6D7E); // Greyish Blue
+        buttonColour = juce::Colour(0xFF2E86C1); // Medium Blue
+        textColour = juce::Colour(0xFFEAECEE); // Light Grey/White
+        break;
+
+    case Default:
+    default:
+        bgColour = juce::Colour(0xFF1F1F2B); // Very Dark Blue
+        boxBgColour = juce::Colour(0xFF282C34); // Dark Slate Grey
+        accentColour = juce::Colour(0xFF00D8FF); // Bright Cyan
+        sliderTrackColour = juce::Colour(0xFF3A4A5C); // Dark Blue-Grey
+        buttonColour = juce::Colour(0xFF3A3A4A); // Charcoal
+        textColour = juce::Colour(0xFFAAAAAA); // Light Grey
+        break;
+    }
+
+    playPauseButton.setImages(true, true, true, playImage, 1.0f, accentColour, playImage, 0.8f, accentColour, playImage, 0.5f, accentColour);
+    goToStartButton.setImages(true, true, true, toStartImage, 1.0f, textColour, toStartImage, 0.8f, textColour, toStartImage, 0.5f, textColour);
+    goToEndButton.setImages(true, true, true, toEndImage, 1.0f, textColour, toEndImage, 0.8f, textColour, toEndImage, 0.5f, textColour);
+
+    loadButton.setColour(juce::TextButton::buttonColourId, buttonColour);
+    loadButton.setColour(juce::TextButton::textColourOffId, textColour);
+
+    // Mute button state depends on audio, so we just set the 'unmuted' state colors
+    if (!playerAudio.GetMuteState()) {
+        muteButton.setColour(juce::TextButton::buttonColourId, buttonColour);
+        muteButton.setColour(juce::TextButton::textColourOffId, textColour);
+    }
+    else // Ensure muted state color is also updated
+    {
+        muteButton.setColour(juce::TextButton::buttonColourId, juce::Colours::red);
+        muteButton.setColour(juce::TextButton::textColourOffId, juce::Colours::white);
+    }
+
+
+    if (!playerAudio.GetRepeatState()) {
+        repeatButton.setColour(juce::TextButton::buttonColourId, buttonColour);
+        repeatButton.setColour(juce::TextButton::textColourOffId, textColour);
+    }
+    else 
+    {
+        repeatButton.setColour(juce::TextButton::buttonColourId, accentColour);
+        repeatButton.setColour(juce::TextButton::textColourOffId, bgColour);
+    }
+
+
+    previousButton.setColour(juce::TextButton::buttonColourId, buttonColour);
+    previousButton.setColour(juce::TextButton::textColourOffId, textColour);
+
+    nextButton.setColour(juce::TextButton::buttonColourId, buttonColour);
+    nextButton.setColour(juce::TextButton::textColourOffId, textColour);
+
+    themeButton.setColour(juce::TextButton::buttonColourId, buttonColour);
+    themeButton.setColour(juce::TextButton::textColourOffId, textColour);
+
+    // Sliders
+    volumeSlider.setColour(juce::Slider::thumbColourId, accentColour);
+    volumeSlider.setColour(juce::Slider::trackColourId, accentColour);
+    volumeSlider.setColour(juce::Slider::backgroundColourId, sliderTrackColour);
+
+    speedSlider.setColour(juce::Slider::thumbColourId, accentColour);
+    speedSlider.setColour(juce::Slider::trackColourId, accentColour);
+    speedSlider.setColour(juce::Slider::backgroundColourId, sliderTrackColour);
+    speedSlider.setColour(juce::Slider::textBoxTextColourId, textColour);
+
+    positionSlider.setColour(juce::Slider::trackColourId, accentColour);
+
+    loopStartSlider.setColour(juce::Slider::thumbColourId, accentColour);
+    loopStartSlider.setColour(juce::Slider::trackColourId, sliderTrackColour);
+    loopStartSlider.setColour(juce::Slider::textBoxTextColourId, textColour);
+    loopStartSlider.setColour(juce::Slider::backgroundColourId, sliderTrackColour.darker(0.1f));
+
+
+    loopEndSlider.setColour(juce::Slider::thumbColourId, accentColour);
+    loopEndSlider.setColour(juce::Slider::trackColourId, sliderTrackColour);
+    loopEndSlider.setColour(juce::Slider::textBoxTextColourId, textColour);
+    loopEndSlider.setColour(juce::Slider::backgroundColourId, sliderTrackColour.darker(0.1f));
+
+
+    // Labels
+    trackInfoLabel.setColour(juce::Label::textColourId, textColour);
+    speedLabel.setColour(juce::Label::textColourId, textColour);
+    timeLabel.setColour(juce::Label::textColourId, textColour);
+    loopStartLabel.setColour(juce::Label::textColourId, textColour);
+    loopEndLabel.setColour(juce::Label::textColourId, textColour);
+
+    // ListBox
+    playlistBox.setColour(juce::ListBox::backgroundColourId, boxBgColour);
+    playlistBox.setColour(juce::ListBox::outlineColourId, sliderTrackColour);
+    playlistBox.updateContent(); 
+
+    repaint();
 }
 
 void PlayerGUI::resized()
 {
-    int buttonWidth = 60;
+    int buttonWidth = 40; //changed from 60 to 40 cuz the theme buttons take more space
     int buttonHeight = 40;
     int margin = 10;
     int topRowY = 10;
@@ -170,6 +255,7 @@ void PlayerGUI::resized()
     nextButton.setBounds(goToEndButton.getRight() + margin, topRowY, buttonWidth, buttonHeight);
     muteButton.setBounds(nextButton.getRight() + margin, topRowY, 80, buttonHeight);
     repeatButton.setBounds(muteButton.getRight() + margin, topRowY, 100, buttonHeight);
+    themeButton.setBounds(repeatButton.getRight() + margin, topRowY, 110, buttonHeight);
 
     int secondRowY = topRowY + buttonHeight + margin;
     volumeSlider.setBounds(margin, secondRowY, getWidth() - (margin * 2), 30);
@@ -177,21 +263,25 @@ void PlayerGUI::resized()
     int thirdRowY = secondRowY + 4 * margin;
     speedSlider.setBounds(margin, thirdRowY, getWidth() - (margin * 2), 30);
 
-    int playlistY = thirdRowY + 20 * margin;
+    int playlistY = thirdRowY + 20 * margin; // This will be updated later
     int trackInfoHeight = 25;
     trackInfoLabel.setBounds(margin, getHeight() - trackInfoHeight - 5, getWidth() - (margin * 2), trackInfoHeight);
-    playlistBox.setBounds(margin, playlistY, getWidth() - (margin * 2), getHeight() - playlistY - trackInfoHeight - 15);
+    // This playlistBox.setBounds is overridden later, but we'll leave it for now
 
-    ////
     int sliderHeight = 30;
 
     int fourthRowY = thirdRowY + sliderHeight + margin;
     int timeLabelWidth = 80;
 
-    timeLabel.setBounds(getWidth() - margin - timeLabelWidth, fourthRowY, timeLabelWidth, sliderHeight);
 
-    int positionSliderWidth = getWidth() - (margin * 3) - timeLabelWidth;
-    positionSlider.setBounds(margin, fourthRowY, positionSliderWidth, sliderHeight);
+    timeLabel.setBounds(margin, fourthRowY, timeLabelWidth, sliderHeight);
+
+    int positionSliderX = timeLabel.getRight() + margin;
+
+    int positionSliderWidth = getWidth() - positionSliderX - margin;
+
+    positionSlider.setBounds(positionSliderX, fourthRowY, positionSliderWidth, sliderHeight);
+
     //feature 10 loop section sliders
     int fifthRowY = fourthRowY + sliderHeight + margin;
     int labelWidth = 80;
@@ -204,12 +294,11 @@ void PlayerGUI::resized()
         getWidth() - (margin * 2) - labelWidth, sliderHeight);
 
     // I will change the playlist box position ya shbab 
-    playlistY = sixthRowY + sliderHeight + margin;
+    playlistY = sixthRowY + sliderHeight + margin; 
     playlistBox.setBounds(margin, playlistY, getWidth() - (margin * 2),
         getHeight() - playlistY - trackInfoHeight - 15);
 
 }
-
 //feature 9
 
 void PlayerGUI::updatePositionSlider()
@@ -270,11 +359,7 @@ void PlayerGUI::timerCallback()
 
 void PlayerGUI::buttonClicked(juce::Button* button)
 {
-    // Define colors for state changes
-    juce::Colour buttonColour(0xFF3A3A4A);
-    juce::Colour textColour(0xFFAAAAAA);
-    juce::Colour accentColour(0xFF00D8FF);
-    juce::Colour bgColour(0xFF1F1F2B);
+    // Local color definitions removed, using member variables now
 
     if (button == &loadButton)
     {
@@ -331,7 +416,7 @@ void PlayerGUI::buttonClicked(juce::Button* button)
         else {
             muteButton.setButtonText("Unmuted");
             muteButton.setColour(juce::TextButton::buttonColourId, buttonColour);
-            muteButton.setColour(juce::TextButton::textColourOffId, textColour);
+            muteButton.setColour(juce::TextButton::textColourOffId, textColour); 
         }
     }
     else if (button == &repeatButton) {
@@ -340,13 +425,32 @@ void PlayerGUI::buttonClicked(juce::Button* button)
         if (playerAudio.GetRepeatState()) {
             repeatButton.setButtonText("is being repeated");
             repeatButton.setColour(juce::TextButton::buttonColourId, accentColour);
-            repeatButton.setColour(juce::TextButton::textColourOffId, bgColour); 
+            repeatButton.setColour(juce::TextButton::textColourOffId, bgColour);
         }
         else {
             repeatButton.setButtonText("click to repeat");
-            repeatButton.setColour(juce::TextButton::buttonColourId, buttonColour);
-            repeatButton.setColour(juce::TextButton::textColourOffId, textColour);
+            repeatButton.setColour(juce::TextButton::buttonColourId, buttonColour); 
+            repeatButton.setColour(juce::TextButton::textColourOffId, textColour); 
         }
+    }
+    else if (button == &themeButton) 
+    {
+        if (currentTheme == Default)
+        {
+            currentTheme = Girls;
+            themeButton.setButtonText("Theme: Girls");
+        }
+        else if (currentTheme == Girls)
+        {
+            currentTheme = Boys;
+            themeButton.setButtonText("Theme: Boys");
+        }
+        else 
+        {
+            currentTheme = Default;
+            themeButton.setButtonText("Theme: Default");
+        }
+        applyTheme();
     }
 }
 // feature 5
@@ -373,7 +477,6 @@ void PlayerGUI::updateTrackInfo()
 void PlayerGUI::updatePlayPauseButton()
 {
     const auto& currentImage = playPauseButton.getNormalImage();
-    juce::Colour accentColour(0xFF00D8FF);
 
     if (playerAudio.isPlaying() && currentImage != pauseImage)
     {
@@ -443,13 +546,10 @@ int PlayerGUI::getNumRows()
 // feature 8
 void PlayerGUI::paintListBoxItem(int rowNumber, juce::Graphics& g, int width, int height, bool rowIsSelected)
 {
-    juce::Colour accentColour(0xFF00D8FF);
-    juce::Colour bgColour(0xFF1F1F2B);
-    juce::Colour textColour(0xFFAAAAAA);
 
     if (rowIsSelected)
     {
-        g.fillAll(accentColour); 
+        g.fillAll(accentColour);
     }
 
     auto trackTitles = playerAudio.getTrackTitles();

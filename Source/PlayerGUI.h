@@ -34,13 +34,31 @@ private:
     void updateTrackInfo();
 
     //feature 9
-
     void updatePositionSlider();
+
+    enum Theme
+    {
+        Default,
+        Girls,      // i used enum so i can use it in switch case easily
+        Boys
+    };
+
+    void applyTheme();
+    Theme currentTheme;
+
+    // --- colour members by basem ---
+    juce::Colour bgColour;
+    juce::Colour boxBgColour;
+    juce::Colour accentColour;
+    juce::Colour sliderTrackColour;
+    juce::Colour buttonColour;
+    juce::Colour textColour;
+    // ------------------------
 
     PlayerAudio& playerAudio;
 
     // GUI elements
-    juce::TextButton loadButton{ "Load Files" }; 
+    juce::TextButton loadButton{ "Load Files" };
 
     juce::ImageButton playPauseButton;
     juce::ImageButton goToStartButton;
@@ -67,9 +85,11 @@ private:
     juce::TextButton nextButton{ ">>" };
 
     //feature 9
-
     juce::Slider positionSlider;
     juce::Label timeLabel;
+
+    // Theme button
+    juce::TextButton themeButton{ "Theme: Default" };
 
     std::unique_ptr<juce::FileChooser> fileChooser;
 
